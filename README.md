@@ -13,15 +13,13 @@ The Server/Container that you are using must implement the API being used.
 
 ## Configuration
 
-### BASIC Authentication
+### DBMS/ Database
 
-This webapp provides REST enpoint to authenticate users and retrive JWT. It uses BASIC authentication to transfer provided username and password. This is not safe if HTTPs is not used.
+Admin credentials are stored in a DBMS. This program will create a new table for storing admin credentials if not exists. By default, the username is stored as plaintext, but only the hash of the password and the salt being used are stored in the database. **No password is stored in plain text.** 
 
-For example, if one wants to get a JWT, he/she will need to send a GET request to the server as follows. A header for BASIC authentication is needed.
+To use the database, you must configure the **persistence.xml** as follows:
 
-	curl -v -H "Authorization: Basic QWxhZGRpbjpPcGVuU2VzYW1l" http://localhost:8080/jwt/api/admin
-
-Once the credential is verified, the generated JWT is sent to the clients in the HTTP response of "text/plain" type.
+	<jta-data-source> your jta data source </jta-data-source>
 
 ### Json Web Token
 
@@ -31,10 +29,24 @@ JWT is generated and signed using RS256 algorithm. A (asymmetric) private key is
 
 If you want to customise the claims or payload or the algorithm being used for JWT, you will need to change the code in **class Authenticator** and the **generateJWT()** method.
 
-## Running This Webapp
+## Deployment
 
 First, package it into a WAR file using maven.
 
 	mvn clean package
 
 Second, deploy it to any server you want to use, e.g., Wildfly19. Then you are good to go.
+
+## Using This App
+
+### GET Request and BASIC Authentication
+
+This webapp provides REST enpoint to authenticate users and retrive JWT. It uses BASIC authentication to transfer provided username and password. This is not safe if HTTPs is not used.
+
+For example, if one wants to get a JWT, he/she will need to send a GET request to the server as follows. A header for BASIC authentication is needed.
+
+	curl -v -H "Authorization: Basic QWxhZGRpbjpPcGVuU2VzYW1l" http://localhost:8080/jwt/api/admin
+
+Once the credential is verified, the generated JWT is sent to the clients in the HTTP response of "text/plain" type.
+
+
