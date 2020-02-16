@@ -8,8 +8,8 @@ public class RandomGenerator {
         var rand = new Random();
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < len; i++) {
-            // ASCII char sets
-            sb.append((char) rand.nextInt(129));
+            // ASCII char sets, Only capital english
+            sb.append((char) (65 + rand.nextInt(26)));
         }
         return sb.toString();
     }
