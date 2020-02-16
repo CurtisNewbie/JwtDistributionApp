@@ -58,8 +58,8 @@ public class Authenticator {
     }
 
     /**
-     * Check whether the provided name and pw (SHA-256 hashed) matches the one in
-     * the database.
+     * Check whether the provided name and pw (SHA-256 hashed with salt) matches the
+     * one in the database.
      * 
      * @param name name
      * @param pw   password
@@ -69,6 +69,8 @@ public class Authenticator {
      */
     public boolean isAuthenticated(String name, String pw) throws NoSuchAlgorithmException {
         Admin admin = dao.getAdmin(name);
+        // add salt
+        pw = pw + admin.getSalt();
         MessageDigest md = MessageDigest.getInstance(hashing_algo);
         String hashInStr = toHexStr(md.digest(pw.getBytes(StandardCharsets.UTF_8)));
         if (admin != null && admin.getKeyHash().equals(hashInStr))
