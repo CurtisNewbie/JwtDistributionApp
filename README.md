@@ -1,6 +1,6 @@
 # JWT Token Distribution Server
 
-A JavaEE8 Webapp that authenticates admins without role **"admin"** (using **HTTP BASIC**) and generates JWT tokens for them to communicate with backend servers using RESTful web services. This is used for the backend server in my another repository: <a href="https://github.com/CurtisNewbie/BookStoreApp">BookStoreApp</a>. It is not implemented in such a way that can be used for general purpose.
+A JavaEE8 Webapp that authenticates admins with role **"admin"** (using **HTTP BASIC**) and generates JWT tokens for them to communicate with backend servers using RESTful web services. This is used for the backend server in my another repository: <a href="https://github.com/CurtisNewbie/BookStoreApp">BookStoreApp</a>. It is not implemented in such a way that can be used for general purpose.
 
 **! Note: Without HTTPS, BASIC is not safe at all, it's only a BASE64 encoded String**.
 
