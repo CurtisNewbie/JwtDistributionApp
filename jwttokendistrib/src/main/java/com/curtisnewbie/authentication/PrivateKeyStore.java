@@ -26,7 +26,7 @@ public class PrivateKeyStore {
     private String loadPrivateKey() throws IOException {
         var in = this.getClass().getClassLoader().getResourceAsStream("config.txt");
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(in));) {
-            return reader.readLine().substring(20);
+            return reader.readLine().substring(12);
         }
     }
 }
