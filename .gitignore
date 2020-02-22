@@ -30,3 +30,6 @@ target/
 
 # jdk settings
 .settings/
+
+# ignore generated keys
+.keys/
