@@ -4,9 +4,12 @@ A JavaEE8 Webapp that authenticates admins with role **"admin"** (using **HTTP B
 
 **! Note: Without HTTPS, BASIC is not safe at all, it's only a BASE64 encoded String**.
 
-**Dependencies**:
+**_If you are using this webapp for <a href="https://github.com/CurtisNewbie/BookStoreApp/">BookstoreApp</a>, their private/public keys are matched intentionally, which works out-of-the-box for demonstration purpose. Nonetheless, you will need to setup the data source for it. For security reson, you should change the keys._**
+
+### Dependencies
 
 - JavaEE 8 or Jakarta EE 8 API
+- Microprofile (<a href="https://github.com/eclipse/microprofile-config">MP-Config</a>)
 - <a href="https://github.com/jwtk/jjwt">JJWT Library</a> for generating JWT
 
 The Server/Container that you are using must implement the API being used.
@@ -15,17 +18,40 @@ The Server/Container that you are using must implement the API being used.
 
 ### DBMS/ Database
 
-Admin credentials are stored in a DBMS. This program will create a new table for storing admin credentials if not exists. By default, the username is stored as plaintext, but only the hash of the password and the salt being used are stored in the database. **No password is stored in plain text.**
+Admin credentials are stored in a DBMS. This program will create a new table for storing admin credentials if not exists. By default, the username is stored as plaintext, but only the hash of the password and the salt being used are stored in the database. No password is stored in plain text.
 
 To use the database, you must configure the **persistence.xml** as follows:
 
     <jta-data-source> your jta data source </jta-data-source>
 
+Note: **You will need to manually add your admin credentials into your database, this webapp only retrieves existing credentials and verifies them for you.**
+
+To create credentials:
+
+1. Add salt to your password (concatenation)
+2. Hash them using SHA256
+3. Insert them to the table
+
+e.g., this is only an example, don't use it for security reason
+
+    ---------------
+    name: apple
+    password: juice
+    --------------
+
+    +--------+------------------------------------------------------------------+------+
+    | name   | keyHash                                                          | salt |
+    +--------+------------------------------------------------------------------+------+
+    | apple  | acdb4ae487227ba3ac329e58a2c250673951e6ce7994c4c4bceeaa7ad6d42cb6 | 1234 |
+    +--------+------------------------------------------------------------------+------+
+
 ### Json Web Token
 
-JWT is generated and signed using RS256 algorithm. A (asymmetric) private key is required. The private key is specified in **src/main/resources/config.txt** as follows:
+JWT is generated and signed using **RS256 algorithm**, which utilises asymmetric cryptography for digital signature (<a href="https://en.wikipedia.org/wiki/JSON_Web_Token">More on wiki</a>). A private key is required. The private key is specified in **./jwttokendistrib/src/main/resources/META-INF/microprofile-config.properties** as follows:
 
-`PRIVATE_KEY=7SGru95I5OEl9+/nx8eihxcSi3RteW7sPP0vD452UZLJURtQx8oQi3TVGnp+VIX6w0i73G/sOFi2Vt8+T3/dQKBgQDtpygYtnzJLj5d4TRG7+p4KXtk9v3WvLPY+sCoDhLXeFcF3iPpm93qxLdQHVQu/An8RfE7q+7+5cxxlGVq08cDKEvGk8whG8d4r4L4TiU4q16LsF+KqNndnN0cpnKw9QJHuWnrN8oazfAr9mTwovZUwawT9N5LAdCp8xy5X77ubQKBgHvIBOeUtJU3KhXRRKLfwvCRTST+GV6DTluB2vemwgi6vM945lkD0Uk8ythZKiY4oCq7Eh5uAVB6R7q6Om3n5U+U01FNvVDJUvsYKC6pSgqNcnH18aZfIC71PgVTrv/9caBF8tps/hDlhG/OQQxEhdC9/nFzPHpCCyqfBS6wQeQVAoGARJ8U4GlyZDkqAz7jn820I8WCZttOsLjXFHW3fdg/vbV9g4yy3EltHqbHhMyZvJjh4DRbJadsBdkFhCsEeHmWrAxkVSIde9BFuecC45F7xzM8XpBxFB+efCzguk8/WoC0ikxDJ6aBCCizpQWws2WYS/c3wh48ETMHm0sRekEl2BE=............`
+**jwt_private_key=**`MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDGkfbaIIRnBwygY9K/jZi1xZs6py4V7UIUelp1agl+p+gxQeKSYbsvwimSX+xpdYQFw3xVib2FILPDLc3sqXrtdysfb7XaPIhCLd33K1kgTJDSkMuxU0If0mIbx+aMegvX5Ekv0TH3u6gBA/O3JtNlDnzIUPtGFrOuNbe7hC0NiY6ZyvTtMz2a+PcyLicE5Kyiahq2v95Yp9w/86tfJRvMwl7garem4gVUJJPJ+/aT1J564VbuIZHvrCCkNZ9RU2iG413lBYJIGnq707FMmzFNpsGidyZRlyGBWLsdz..........`
+
+**_If you are using this webapp for <a href="https://github.com/CurtisNewbie/BookStoreApp/">BookstoreApp</a>, their private/public keys are matched intentionally, which works out-of-the-box for demonstration purpose. You should change them for security reason._**
 
 If you want to customise the claims or payload or the algorithm being used for JWT, you will need to change the code in **class Authenticator** and the **generateJWT()** method.
 
@@ -45,6 +71,6 @@ This webapp provides REST enpoint to authenticate users and retrive JWT. It uses
 
 For example, if one wants to get a JWT, he/she will need to send a GET request to the server as follows. A header for BASIC authentication is needed.
 
-    curl -v -H "Authorization: Basic QWxhZGRpbjpPcGVuU2VzYW1l" http://localhost:8080/jwt/api/admin
+    curl -v -H "Authorization: Basic YXBwbGU6anVpY2U=" http://localhost:8080/jwt/api/admin
 
-Once the credential is verified, the generated JWT is sent to the clients in the HTTP response of "text/plain" type.
+The authorization header above uses the credential (username: apple, password: juice). Once the credential is verified, the generated JWT is sent to the clients in the HTTP response ("text/plain").
