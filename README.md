@@ -4,7 +4,7 @@ A JavaEE8 Webapp that authenticates admins with role **"admin"** (using **HTTP B
 
 **! Note: Without HTTPS, BASIC is not safe at all, it's only a BASE64 encoded String**.
 
-**_If you are using this webapp for <a href="https://github.com/CurtisNewbie/BookStoreApp/">BookstoreApp</a>, their private/public keys are matched intentionally, which works out-of-the-box for demonstration purpose. Nonetheless, you will need to setup the data source for it. For security reson, you should change the keys._**
+**_If you are using this webapp for <a href="https://github.com/CurtisNewbie/BookStoreApp/">BookstoreApp</a>, their private/public keys are matched intentionally, which works out-of-the-box for demonstration purpose. Nonetheless, you will need to setup the data source for it. For security reason, you should change the keys._**
 
 ### Dependencies
 
