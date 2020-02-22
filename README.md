@@ -1,10 +1,10 @@
 # JWT Token Distribution Server
 
-A JavaEE8 Webapp that authenticates admins with role **"admin"** (using **HTTP BASIC**) and generates JWT tokens for them to communicate with backend servers using RESTful web services. This is used for the backend server in my another repository: <a href="https://github.com/CurtisNewbie/BookStoreApp">BookStoreApp</a>. It is not implemented in such a way that can be used for general purpose.
+A JavaEE8 Webapp that authenticates admins with role **"admin"** (using **HTTP BASIC**) and generates JWT tokens for them to communicate with backend servers using RESTful web services. This is used for the backend server in my another repository: <a href="https://github.com/CurtisNewbie/BookStoreApp">BookStoreApp</a>. This repository also contains a tool (in <a href="https://github.com/CurtisNewbie/JwtDistributionApp/tree/master/keyGenTool">./keyGenTool</a>) that generates a new pair of keys (RSA algorithm), which can be used for JWT generation and configuration.
 
 **! Note: Without HTTPS, BASIC is not safe at all, it's only a BASE64 encoded String**.
 
-**_If you are using this webapp for <a href="https://github.com/CurtisNewbie/BookStoreApp/">BookstoreApp</a>, their private/public keys are matched intentionally, which works out-of-the-box for demonstration purpose. Nonetheless, you will need to setup the data source for it. For security reason, you should change the keys._**
+**If you are using this webapp for <a href="https://github.com/CurtisNewbie/BookStoreApp/">BookstoreApp</a>, their private/public keys are matched intentionally, which works out-of-the-box for demonstration purpose. Nonetheless, you will need to setup the data source for it. For security reason, you should change the keys.**
 
 ### Dependencies
 
@@ -47,21 +47,19 @@ e.g., this is only an example, don't use it for security reason
 
 ### Json Web Token
 
-JWT is generated and signed using **RS256 algorithm**, which utilises asymmetric cryptography for digital signature (<a href="https://en.wikipedia.org/wiki/JSON_Web_Token">More on wiki</a>). A private key is required. The private key is specified in **./jwttokendistrib/src/main/resources/META-INF/microprofile-config.properties** as follows:
+JWT is generated and signed using **RS256 algorithm**, which utilises asymmetric cryptography for digital signature (<a href="https://en.wikipedia.org/wiki/JSON_Web_Token">More on wiki</a>). A private key is required. The private key is specified in **<a href="https://github.com/CurtisNewbie/JwtDistributionApp/blob/master/jwttokendistrib/src/main/resources/META-INF/microprofile-config.properties">./jwttokendistrib/src/main/resources/META-INF/microprofile-config.properties**</a> as follows:
 
-**jwt_private_key=**`MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDGkfbaIIRnBwygY9K/jZi1xZs6py4V7UIUelp1agl+p+gxQeKSYbsvwimSX+xpdYQFw3xVib2FILPDLc3sqXrtdysfb7XaPIhCLd33K1kgTJDSkMuxU0If0mIbx+aMegvX5Ekv0TH3u6gBA/O3JtNlDnzIUPtGFrOuNbe7hC0NiY6ZyvTtMz2a+PcyLicE5Kyiahq2v95Yp9w/86tfJRvMwl7garem4gVUJJPJ+/aT1J564VbuIZHvrCCkNZ9RU2iG413lBYJIGnq707FMmzFNpsGidyZRlyGBWLsdz..........`
+    jwt_private_key=MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDGkfbaIIRnBwygY9K/jZi1xZs6py4V7UIUelp1a..........
 
-**_If you are using this webapp for <a href="https://github.com/CurtisNewbie/BookStoreApp/">BookstoreApp</a>, their private/public keys are matched intentionally, which works out-of-the-box for demonstration purpose. You should change them for security reason._**
-
-If you want to customise the claims or payload or the algorithm being used for JWT, you will need to change the code in **class Authenticator** and the **generateJWT()** method.
+You may use the <a href="https://github.com/CurtisNewbie/JwtDistributionApp/tree/master/keyGenTool">KeyGenTool</a> to generate a new pair of keys for JWT generation and verification. **If you are using this webapp for <a href="https://github.com/CurtisNewbie/BookStoreApp/">BookstoreApp</a>, their private/public keys are matched intentionally, which works out-of-the-box for demonstration purpose. You should change them for security reason.** If you want to customise the claims or payload or the algorithm being used for JWT, you will need to change the code in **class Authenticator** and the **generateJWT()** method.
 
 ## Deployment
 
-First, package it into a WAR file using maven.
+First, package it into a WAR file using maven. Execute following command under directory "./jwttokendistrib"
 
     mvn clean package
 
-Second, deploy it to any server you want to use, e.g., Wildfly19. Then you are good to go.
+Second, deploy the WAR file to any server you want to use, e.g., Wildfly19. Then you are good to go.
 
 ## Using This App
 
@@ -74,3 +72,24 @@ For example, if one wants to get a JWT, he/she will need to send a GET request t
     curl -v -H "Authorization: Basic YXBwbGU6anVpY2U=" http://localhost:8080/jwt/api/admin
 
 The authorization header above uses the credential (username: apple, password: juice). Once the credential is verified, the generated JWT is sent to the clients in the HTTP response ("text/plain").
+
+### Example of Generated JWT
+
+Below is the decoded JWT token (without digital signature)
+
+    {
+        "kid": "jwt.key",
+        "typ": "JWT",
+        "alg": "RS256"
+    }
+    {
+        "groups": [
+            "admin"
+        ],
+        "upn": "bookstore",
+        "jti": "CNFWRCYLNO",
+        "sub": "apple",
+        "iss": "bookstore",
+        "iat": 1582409868,
+        "exp": 1582410868
+    }
