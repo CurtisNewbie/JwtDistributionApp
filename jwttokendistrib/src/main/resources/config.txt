@@ -1,1 +1,0 @@
-PRIVATE_KEY=change/to/your/private/key
