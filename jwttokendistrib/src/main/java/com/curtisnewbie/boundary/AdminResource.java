@@ -11,12 +11,12 @@ import javax.ws.rs.core.Response;
 
 import com.curtisnewbie.authentication.Authenticator;
 
-@Path("admin")
+@Path("/admin")
 @RequestScoped
 public class AdminResource {
 
     @Inject
-    private Authenticator auth;
+    Authenticator auth;
 
     @GET
     @Produces(MediaType.TEXT_PLAIN)

@@ -10,7 +10,7 @@ import java.security.PrivateKey;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.time.Instant;
 import java.util.Base64;
-import javax.ejb.Stateless;
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.ws.rs.WebApplicationException;
 
@@ -18,28 +18,28 @@ import com.curtisnewbie.persistence.Admin;
 import com.curtisnewbie.persistence.AdminDao;
 import com.curtisnewbie.util.RandomGenerator;
 
-@Stateless
+@ApplicationScoped
 public class Authenticator {
 
     /** length of jti property in JWT */
     private final int JTI_LEN = 10;
 
     @Inject
-    private RandomGenerator generator;
+    RandomGenerator generator;
 
     @Inject
-    private PrivateKeyStore keyStore;
+    PrivateKeyStore keyStore;
 
     @Inject
-    private AdminDao dao;
+    AdminDao dao;
 
     @Inject
     @HashAlgorithm
-    private String hashing_algo;
+    String hashing_algo;
 
     @Inject
     @AsymmetricAlgorithm
-    private String asyme_algo;
+    String asyme_algo;
 
     /**
      * Decode BASIC encoded string to an array of username and password

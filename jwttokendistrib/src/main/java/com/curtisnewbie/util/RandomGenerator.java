@@ -2,6 +2,9 @@ package com.curtisnewbie.util;
 
 import java.util.Random;
 
+import javax.enterprise.context.Dependent;
+
+@Dependent
 public class RandomGenerator {
 
     public String generateRandomString(int len) {

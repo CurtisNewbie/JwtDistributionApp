@@ -1,20 +1,19 @@
 package com.curtisnewbie.persistence;
 
-import static javax.ejb.TransactionAttributeType.SUPPORTS;
-
-import javax.ejb.Stateless;
-import javax.ejb.TransactionAttribute;
+import javax.enterprise.context.ApplicationScoped;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.transaction.Transactional;
+import javax.transaction.Transactional.TxType;
 import javax.validation.constraints.NotNull;
 
-@Stateless
+@ApplicationScoped
 public class AdminDao {
 
     @PersistenceContext
     private EntityManager em;
 
-    @TransactionAttribute(SUPPORTS)
+    @Transactional(value = TxType.SUPPORTS)
     public Admin getAdmin(@NotNull String name) {
         return em.find(Admin.class, name);
     }
