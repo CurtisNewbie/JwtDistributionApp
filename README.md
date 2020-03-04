@@ -1,28 +1,51 @@
 # JWT Token Distribution Server
 
-A JavaEE8 Webapp that authenticates admins with role **"admin"** (using **HTTP BASIC**) and generates JWT tokens for them to communicate with backend servers using RESTful web services. This is used for the backend server in my another repository: <a href="https://github.com/CurtisNewbie/BookStoreApp">BookStoreApp</a>. This repository also contains a tool (in <a href="https://github.com/CurtisNewbie/JwtDistributionApp/tree/master/keyGenTool">./keyGenTool</a>) that generates a new pair of keys (RSA algorithm), which can be used for JWT generation and configuration.
+A Quarkus application that authenticates admins with role **"admin"** (using **HTTP BASIC**) and generates JWT tokens for them to communicate with backend servers using RESTful web services. This is used for the backend server in my another repository: <a href="https://github.com/CurtisNewbie/BookStoreApp">BookStoreApp</a>. This repository also contains a tool (in <a href="https://github.com/CurtisNewbie/JwtDistributionApp/tree/master/keyGenTool">./keyGenTool</a>) that generates a new pair of keys (using RSA algorithm), which can be used for JWT generation and configuration.
 
 **! Note: Without HTTPS, BASIC is not safe at all, it's only a BASE64 encoded String**.
 
-**If you are using this webapp for <a href="https://github.com/CurtisNewbie/BookStoreApp/">BookstoreApp</a>, their private/public keys are matched intentionally, which works out-of-the-box for demonstration purpose. Nonetheless, you will need to setup the data source for it. For security reason, you should change the keys.**
+**If you are using this webapp for <a href="https://github.com/CurtisNewbie/BookStoreApp/">BookstoreApp</a>, their private/public keys are matched intentionally, which works out-of-the-box for demonstration purpose without any extra configuration. For security reason, you should change the keys.**
 
-### Dependencies
+### Prerequisite
 
-- JavaEE 8 or Jakarta EE 8 API
-- Microprofile (<a href="https://github.com/eclipse/microprofile-config">MP-Config</a>)
-- <a href="https://github.com/jwtk/jjwt">JJWT Library</a> for generating JWT
+- Java 11 (MUST)
 
-The Server/Container that you are using must implement the API being used.
+## Running DEMO
 
-## Configuration
+The demo version in release is configured in such a way that you don't need to change anything to make it work. To run it, you simply execute:
+
+    java -jar jwttokendistrib-1.0.0-demo.jar
+
+An admin credentail is already loaded for demo purpose:
+
+    ---------------
+    name: apple
+    password: juice
+    --------------
+
+You retrieve JWT by sending a GET request with BASIC authentication as below, this request uses the pre-loaded credential ("apple, juice").
+
+    curl -v -H "Authorization: Basic YXBwbGU6anVpY2U=" http://localhost:8081/auth/api/admin
+
+If you are using my <a href="https://github.com/CurtisNewbie/BookStoreApp">BookStoreApp</a>, it will work out-of-the-box, since their private/public keys are matched intentionally.
+
+## Custom Configuration
+
+- In `microprofile-config.properties`:
+
+  - JWT private key
+  - Datasource for database connection
+  - HTTP root path
+  - CORS filter, allowed origins
+  - Packaging fat-jar or thin-jar
+  - HTTP port (the default is 8081)
+
+- In `pom.xml`:
+  - Dependency for jdbc driver (if you change to another DBMS)
 
 ### DBMS/ Database
 
 Admin credentials are stored in a DBMS. This program will create a new table for storing admin credentials if not exists. By default, the username is stored as plaintext, but only the hash of the password and the salt being used are stored in the database. No password is stored in plain text.
-
-To use the database, you must configure the **persistence.xml** as follows:
-
-    <jta-data-source> your jta data source </jta-data-source>
 
 Note: **You will need to manually add your admin credentials into your database, this webapp only retrieves existing credentials and verifies them for you.**
 
@@ -47,19 +70,17 @@ e.g., this is only an example, don't use it for security reason
 
 ### Json Web Token
 
-JWT is generated and signed using **RS256 algorithm**, which utilises asymmetric cryptography for digital signature (<a href="https://en.wikipedia.org/wiki/JSON_Web_Token">More on wiki</a>). A private key is required. The private key is specified in **<a href="https://github.com/CurtisNewbie/JwtDistributionApp/blob/master/jwttokendistrib/src/main/resources/META-INF/microprofile-config.properties">./jwttokendistrib/src/main/resources/META-INF/microprofile-config.properties**</a> as follows:
-
-    jwt_private_key=MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDGkfbaIIRnBwygY9K/jZi1xZs6py4V7UIUelp1a..........
-
-You may use the <a href="https://github.com/CurtisNewbie/JwtDistributionApp/tree/master/keyGenTool">KeyGenTool</a> to generate a new pair of keys for JWT generation and verification. **If you are using this webapp for <a href="https://github.com/CurtisNewbie/BookStoreApp/">BookstoreApp</a>, their private/public keys are matched intentionally, which works out-of-the-box for demonstration purpose. You should change them for security reason.** If you want to customise the claims or payload or the algorithm being used for JWT, you will need to change the code in **class Authenticator** and the **generateJWT()** method.
+JWT is generated and signed using **RS256 algorithm**, which utilises asymmetric cryptography for digital signature (<a href="https://en.wikipedia.org/wiki/JSON_Web_Token">More on wiki</a>). A private key is required. The private key is specified in `microprofile-config.properties`. You may use my <a href="https://github.com/CurtisNewbie/JwtDistributionApp/tree/master/keyGenTool">KeyGenTool</a> to generate a new pair of keys for JWT generation and verification. If you want to customise the claims or payload or the algorithm being used for JWT, you will need to change the code in **class Authenticator**, in the **generateJWT()** method.
 
 ## Deployment
 
-First, package it into a WAR file using maven. Execute following command under directory "./jwttokendistrib"
+First, package it into a jar file using maven. Execute following command in directory `./jwttokendistrib`
 
     mvn clean package
 
-Second, deploy the WAR file to any server you want to use, e.g., Wildfly19. Then you are good to go.
+Then, you can run it as follows (if a fat jar is packaged, use the one named "runner"):
+
+    java -jar jwttokendistrib-1.0.0-runner.jar
 
 ## Using This App
 
