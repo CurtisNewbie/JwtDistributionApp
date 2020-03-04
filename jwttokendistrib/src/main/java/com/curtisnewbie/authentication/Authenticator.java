@@ -12,6 +12,7 @@ import java.time.Instant;
 import java.util.Base64;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.WebApplicationException;
 
 import com.curtisnewbie.persistence.Admin;
@@ -69,6 +70,8 @@ public class Authenticator {
      */
     public boolean isAuthenticated(String name, String pw) throws NoSuchAlgorithmException {
         Admin admin = dao.getAdmin(name);
+        if (admin == null)
+            throw new NotFoundException();
         // add salt
         pw = pw + admin.getSalt();
         MessageDigest md = MessageDigest.getInstance(hashing_algo);
