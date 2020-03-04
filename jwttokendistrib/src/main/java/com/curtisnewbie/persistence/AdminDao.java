@@ -1,8 +1,8 @@
 package com.curtisnewbie.persistence;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 import javax.transaction.Transactional.TxType;
 import javax.validation.constraints.NotNull;
@@ -10,7 +10,7 @@ import javax.validation.constraints.NotNull;
 @ApplicationScoped
 public class AdminDao {
 
-    @PersistenceContext
+    @Inject
     private EntityManager em;
 
     @Transactional(value = TxType.SUPPORTS)
