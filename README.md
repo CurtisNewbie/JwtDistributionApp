@@ -90,7 +90,7 @@ This webapp provides REST enpoint to authenticate users and retrive JWT. It uses
 
 For example, if one wants to get a JWT, he/she will need to send a GET request to the server as follows. A header for BASIC authentication is needed.
 
-    curl -v -H "Authorization: Basic YXBwbGU6anVpY2U=" http://localhost:8080/jwt/api/admin
+    curl -v -H "Authorization: Basic YXBwbGU6anVpY2U=" http://localhost:8081/auth/api/admin
 
 The authorization header above uses the credential (username: apple, password: juice). Once the credential is verified, the generated JWT is sent to the clients in the HTTP response ("text/plain").
 
